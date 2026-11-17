@@ -9,11 +9,12 @@ Built with Next.js 16 (App Router, Server Actions), SQLite/libSQL through Drizzl
 ```bash
 npm install
 cp .env.example .env        # then set SESSION_SECRET to a long random string
-npm run db:push             # create the database tables
-npm run db:seed             # categories, collections, FAQs, draft policy pages and sample products
+npm run db:setup            # apply migrations, add starter content and sample products
 npm run admin:create -- you@example.com "a-strong-password" "Your Name"
 npm run dev                 # http://localhost:3000  ·  admin at /admin
 ```
+
+Schema changes: edit `src/db/schema.ts`, run `npm run db:generate`, commit the new file in `drizzle/`. It is applied automatically on the next deploy.
 
 ## What's in the store
 
@@ -57,22 +58,31 @@ Order emails are **not** sent: no email provider is connected. Customers see eve
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | `file:./data/posh.db` locally. For hosting, a [Turso](https://turso.tech)/libSQL URL. |
-| `DATABASE_AUTH_TOKEN` | Turso token (only for a remote database). |
+| `DATABASE_URL` | `file:./data/posh.db` locally. In production, a [Turso](https://turso.tech)/libSQL URL (`TURSO_DATABASE_URL` also works). |
+| `DATABASE_AUTH_TOKEN` | Turso token for a remote database (`TURSO_AUTH_TOKEN` also works). |
+| `BLOB_READ_WRITE_TOKEN` | Set by connecting a Vercel Blob store. Uploaded photos go there instead of `UPLOAD_DIR`. |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Creates the first admin during deploy if none exists. |
 | `SESSION_SECRET` | Signs login cookies. **Required** in production: 32+ random characters. |
-| `NEXT_PUBLIC_SITE_URL` | Canonical URL for SEO metadata, sitemap and the Paystack callback. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL for SEO metadata, sitemap and the Paystack callback. On Vercel it defaults to the production domain. |
 | `PAYSTACK_SECRET_KEY` | Enables card payments. |
 | `UPLOAD_DIR` | Where uploaded photos are stored (default `./uploads`). |
 
-## Deploying
+## Deploying to Vercel
 
-The simplest setup is a Node host with a persistent disk (Railway, Render, Fly.io or a VPS). Keep `data/` and `uploads/` on that disk, then:
+Vercel has no persistent disk, so the store uses a hosted database (Turso) and hosted photo storage (Vercel Blob). Both are added from the Vercel dashboard in a few clicks.
 
-```bash
-npm ci && npm run db:push && npm run build && npm start
-```
+1. **Import the repository.** Vercel → Add New → Project → choose `Poshjewels`. Keep the detected Next.js settings; the build runs `npm run vercel-build`.
+2. **Add the database.** Project → Storage → *Create Database* → **Turso** (from the Marketplace) → connect it to this project. This sets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
+3. **Add photo storage.** Project → Storage → *Create* → **Blob** → connect it to this project. This sets the Blob credentials.
+4. **Add environment variables** (Project → Settings → Environment Variables):
+   - `SESSION_SECRET`: a random string of 32+ characters (for example, the output of `openssl rand -hex 32`).
+   - `ADMIN_EMAIL` and `ADMIN_PASSWORD`: your first admin login (10+ character password). Used once, when no admin exists.
+   - Optional: `NEXT_PUBLIC_SITE_URL` (your custom domain) and `PAYSTACK_SECRET_KEY`.
+5. **Deploy** (Deployments → Redeploy). Each build applies pending migrations; the first one also adds the starter content and sample products. Every later push to `main` deploys automatically.
 
-Serverless hosts such as Vercel have no persistent disk. There, use a Turso database (`DATABASE_URL` + `DATABASE_AUTH_TOKEN`) and move photo uploads to object storage; `src/lib/uploads.ts` is the single place to change.
+If a build fails with *"No database configured"*, step 2 hasn't been connected to the project yet.
+
+**Other hosts.** Any Node host works. With a persistent disk, keep `data/` and `uploads/` on it and run `npm ci && npm run db:setup && npm run build && npm start`.
 
 ## Project layout
 

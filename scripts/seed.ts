@@ -11,10 +11,10 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { eq } from "drizzle-orm";
 import * as schema from "../src/db/schema";
+import { dbAuthToken, dbUrl } from "../src/db/config";
 
 const client = createClient({
-  url: process.env.DATABASE_URL ?? "file:./data/posh.db",
-  authToken: process.env.DATABASE_AUTH_TOKEN || undefined,
+  url: dbUrl, authToken: dbAuthToken,
 });
 const db = drizzle(client, { schema });
 

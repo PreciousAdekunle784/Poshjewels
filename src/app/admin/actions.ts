@@ -9,7 +9,7 @@ import { requireAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/format";
 import { cancelOrder } from "@/lib/orders";
 import { DEFAULT_SETTINGS, getSetting, saveSetting, type SettingsKey, type SiteSettings } from "@/lib/settings";
-import { deleteImage, saveImage } from "@/lib/uploads";
+import { deleteImage, isBlobUrl, saveImage } from "@/lib/uploads";
 
 export type ActionResult = { ok: boolean; message: string } | null;
 
@@ -73,7 +73,7 @@ export async function saveProductAction(payload: ProductPayload): Promise<{ ok: 
   const parsed = productPayload.safeParse(payload);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0].message };
   const p = parsed.data;
-  const imgOk = p.images.every((i) => i.url.startsWith("/media/") || i.url.startsWith("/demo/"));
+  const imgOk = p.images.every((i) => i.url.startsWith("/media/") || i.url.startsWith("/demo/") || isBlobUrl(i.url));
   if (!imgOk) return { ok: false, message: "Images must be uploaded through the dashboard." };
 
   let slug = slugify(p.slug || p.name) || `piece-${Date.now()}`;
