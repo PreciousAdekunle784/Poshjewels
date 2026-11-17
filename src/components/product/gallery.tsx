@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, ViewTransition } from "react";
 
-export function Gallery({ images, name }: { images: { url: string; alt: string }[]; name: string }) {
+export function Gallery({ images, name, productId }: { images: { url: string; alt: string }[]; name: string; productId: number }) {
   const [active, setActive] = useState(0);
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +47,14 @@ export function Gallery({ images, name }: { images: { url: string; alt: string }
         >
           {images.map((img, i) => (
             <div key={img.url + i} className="relative aspect-[4/5] w-full shrink-0 snap-center overflow-hidden bg-bone">
-              <Image src={img.url} alt={img.alt || name} fill priority={i === 0} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
+              {i === 0 ? (
+                // Shares its name with the product card that was clicked, so the photograph morphs into place.
+                <ViewTransition name={`product-${productId}`} share="morph" default="none">
+                  <Image src={img.url} alt={img.alt || name} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
+                </ViewTransition>
+              ) : (
+                <Image src={img.url} alt={img.alt || name} fill sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
+              )}
             </div>
           ))}
         </div>

@@ -7,7 +7,7 @@ import { getSettings } from "@/lib/settings";
 
 export const metadata = { title: "Homepage" };
 
-const emphHint = "Wrap a word in *asterisks* to set it in italic.";
+const emphHint = "Wrap a word in *asterisks* to set it in the fine hairline weight.";
 
 export default async function HomepageAdmin() {
   const s = await getSettings(["hero", "featured", "editorial", "sections", "newsletter", "brand"]);

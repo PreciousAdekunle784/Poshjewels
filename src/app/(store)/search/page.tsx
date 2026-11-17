@@ -14,7 +14,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </label>
         <div className="flex max-w-xl border-b border-espresso">
           <input id="q" name="q" defaultValue={q} placeholder="Search jewellery" className="h-12 min-w-0 flex-1 bg-transparent text-[17px] outline-none" />
-          <button className="label px-2">Search</button>
+          <button className="cta-link self-center">Search</button>
         </div>
       </form>
       <CatalogView

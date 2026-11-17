@@ -58,7 +58,7 @@ export function PurchasePanel({ product }: { product: ProductCardData }) {
 
   return (
     <div>
-      <p className="tabular mt-4 text-[18px]">
+      <p className="tabular mt-4 text-[19px] tracking-[0.01em]">
         {product.compareAtPrice && price === product.price ? (
           <>
             <span className="text-oxblood">{formatNaira(price)}</span>
@@ -88,7 +88,7 @@ export function PurchasePanel({ product }: { product: ProductCardData }) {
                   setError(null);
                 }}
                 aria-pressed={v.id === variantId}
-                className={`min-h-11 min-w-[3rem] border px-4 text-[14px] transition-colors ${
+                className={`min-h-11 min-w-[3rem] border px-4 text-[14px] transition-colors duration-300 ${
                   v.id === variantId ? "border-espresso bg-espresso text-ivory" : "border-line hover:border-espresso"
                 } ${v.stock <= 0 ? "text-stone line-through decoration-1" : ""}`}
               >
@@ -106,8 +106,15 @@ export function PurchasePanel({ product }: { product: ProductCardData }) {
 
       <div className="mt-4 flex gap-3">
         <QuantityStepper value={qty} max={Math.max(1, available)} onChange={setQty} label={product.name} />
-        <button type="button" onClick={addToBag} disabled={!product.inStock || (variant && variant.stock <= 0)} className="btn btn-solid flex-1">
-          {!product.inStock || (variant && variant.stock <= 0) ? "Sold out" : `Add to bag · ${formatNaira(price * qty)}`}
+        <button type="button" onClick={addToBag} disabled={!product.inStock || (variant && variant.stock <= 0)} className="btn btn-solid btn-buy flex-1">
+          {!product.inStock || (variant && variant.stock <= 0) ? (
+            <span>Sold out</span>
+          ) : (
+            <>
+              <span>Add to bag</span>
+              <span className="btn-buy-price">{formatNaira(price * qty)}</span>
+            </>
+          )}
         </button>
       </div>
       {error && (

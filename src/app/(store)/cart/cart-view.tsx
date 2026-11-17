@@ -69,8 +69,9 @@ export function CartView() {
             </li>
           ))}
         </ul>
-        <Link href="/shop" className="link label mt-6 inline-block">
-          Continue shopping
+        <Link href="/shop" className="cta-link mt-6">
+          <span>Continue shopping</span>
+          <span className="arrow" aria-hidden />
         </Link>
       </div>
       <aside className="lg:col-span-4">
@@ -86,8 +87,9 @@ export function CartView() {
               <dd>Calculated at checkout</dd>
             </div>
           </dl>
-          <Link href="/checkout" className="btn btn-solid mt-6 w-full">
-            Checkout
+          <Link href="/checkout" className="btn btn-solid btn-cta mt-6 w-full">
+            <span>Go to checkout</span>
+            <span className="arrow" aria-hidden />
           </Link>
         </div>
       </aside>

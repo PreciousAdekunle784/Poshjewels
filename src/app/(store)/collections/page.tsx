@@ -30,7 +30,7 @@ export default async function CollectionsPage() {
   return (
     <div className="wrap pb-24">
       <header className="pb-10 pt-10 lg:pt-14">
-        <h1 className="display text-[40px] lg:text-[56px]">Collections</h1>
+        <h1 className="display t-title">Collections</h1>
         <p className="mt-3 max-w-[46ch] text-stone">Edits put together around a mood, a moment or a way of wearing.</p>
       </header>
       <ul className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-5">

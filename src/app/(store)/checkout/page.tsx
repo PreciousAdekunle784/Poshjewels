@@ -15,7 +15,7 @@ export default async function CheckoutPage() {
 
   return (
     <div className="wrap pb-24">
-      <h1 className="display pb-8 pt-10 text-[40px] lg:pt-14 lg:text-[52px]">Checkout</h1>
+      <h1 className="display t-title pb-8 pt-10 lg:pt-14">Checkout</h1>
       <CheckoutForm
         shipping={{ lagosFee: settings.shipping.lagosFee, otherStatesFee: settings.shipping.otherStatesFee, freeShippingThreshold: settings.shipping.freeShippingThreshold }}
         methods={methods}

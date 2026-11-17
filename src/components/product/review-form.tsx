@@ -62,7 +62,7 @@ export function ReviewForm({ productId }: { productId: number }) {
       <p className="text-[12.5px] text-stone">Reviews are checked before they appear. Use the email from your order and your review will be marked as a verified purchase.</p>
       {state && !state.ok && <p className="text-[13.5px] text-oxblood">{state.message}</p>}
       <div>
-        <button className="btn btn-solid" disabled={pending}>
+        <button className="btn btn-solid btn-submit" disabled={pending} data-pending={pending ? "true" : "false"}>
           {pending ? "Sending…" : "Submit review"}
         </button>
       </div>

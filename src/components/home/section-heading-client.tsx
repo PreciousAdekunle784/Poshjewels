@@ -1,11 +1,14 @@
+import { Reveal } from "@/components/motion/reveal";
+import { Words, plain } from "@/components/motion/words";
+
 export function SectionHeadingClient({ id, title, copy, children }: { id: string; title: string; copy?: string; children?: React.ReactNode }) {
   return (
-    <div className="mb-8 flex items-end justify-between gap-6 lg:mb-10">
+    <div className="mb-9 flex items-end justify-between gap-6 lg:mb-12">
       <div>
-        <h2 id={id} className="display text-[32px] lg:text-[42px]">
-          {title}
-        </h2>
-        {copy && <p className="mt-2 text-stone">{copy}</p>}
+        <Reveal as="h2" kind="words" id={id} className="display t-section" aria-label={plain(title)}>
+          <Words text={title} />
+        </Reveal>
+        {copy && <p className="mt-3 text-stone">{copy}</p>}
       </div>
       {children}
     </div>

@@ -75,7 +75,7 @@ export async function CatalogView({
       <header className="grid gap-4 pb-8 pt-10 lg:grid-cols-12 lg:items-end lg:pb-10 lg:pt-14">
         <div className="lg:col-span-7">
           {eyebrow && <div className="label mb-3 text-stone">{eyebrow}</div>}
-          <h1 className="display text-[40px] lg:text-[56px]">{title}</h1>
+          <h1 className="display t-title">{title}</h1>
         </div>
         {intro && <p className="max-w-[46ch] leading-relaxed text-stone lg:col-span-4 lg:col-start-9">{intro}</p>}
       </header>
@@ -105,7 +105,7 @@ export async function CatalogView({
       {result.pageCount > 1 && (
         <nav aria-label="Pagination" className="mt-16 flex items-center justify-center gap-1">
           {result.page > 1 && (
-            <Link href={pageHref(result.page - 1)} className="label px-3 py-2 hover:underline">
+            <Link href={pageHref(result.page - 1)} className="cta-link mr-3">
               Previous
             </Link>
           )}
@@ -120,7 +120,7 @@ export async function CatalogView({
             </Link>
           ))}
           {result.page < result.pageCount && (
-            <Link href={pageHref(result.page + 1)} className="label px-3 py-2 hover:underline">
+            <Link href={pageHref(result.page + 1)} className="cta-link ml-3">
               Next
             </Link>
           )}

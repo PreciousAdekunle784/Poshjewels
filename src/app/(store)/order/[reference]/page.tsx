@@ -37,7 +37,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
     <div className="wrap grid gap-12 pb-24 pt-10 lg:grid-cols-12 lg:pt-14">
       <div className="lg:col-span-7">
         <p className="label text-stone">Order {order.reference}</p>
-        <h1 className="display mt-3 text-[36px] lg:text-[48px]">{headline}</h1>
+        <h1 className="display t-title mt-3">{headline}</h1>
         <p className="mt-4 max-w-[52ch] text-stone">
           {awaitingTransfer
             ? "Complete your bank transfer using the details below. We'll start preparing your order as soon as payment arrives."
@@ -136,8 +136,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
             </div>
           </dl>
         </div>
-        <Link href="/shop" className="link label mt-6 inline-block">
-          Continue shopping
+        <Link href="/shop" className="cta-link mt-6">
+          <span>Continue shopping</span>
+          <span className="arrow" aria-hidden />
         </Link>
       </aside>
     </div>

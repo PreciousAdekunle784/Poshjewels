@@ -41,7 +41,7 @@ export function ContactForm() {
       </label>
       {state && !state.ok && <p className="text-[14px] text-oxblood">{state.message}</p>}
       <div>
-        <button className="btn btn-solid" disabled={pending}>
+        <button className="btn btn-solid btn-submit" disabled={pending} data-pending={pending ? "true" : "false"}>
           {pending ? "Sending…" : "Send message"}
         </button>
       </div>

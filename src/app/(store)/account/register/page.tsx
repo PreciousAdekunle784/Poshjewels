@@ -12,7 +12,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   if (await getSession()) redirect("/account");
   return (
     <div className="wrap max-w-[440px] pb-24 pt-14 lg:pt-20">
-      <h1 className="display text-[40px]">Create an account</h1>
+      <h1 className="display t-title">Create an account</h1>
       <p className="mb-8 mt-2 text-stone">Keep track of your orders in one place.</p>
       <AuthForm
         action={registerAction}

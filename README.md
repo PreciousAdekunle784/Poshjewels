@@ -88,9 +88,31 @@ scripts/             seed and admin-creation scripts
 tests/               payment verification tests
 ```
 
-## Design notes
+## Design system
 
-- **Type:** Bodoni Moda for headlines and collection titles (a didone, in keeping with jewellery-house and fashion-magazine typography), used sparingly. Jost for navigation, product information and body text.
-- **Colour:** ivory `#F5EFE6`, bone `#EAE1D3`, espresso `#1F1813`, cocoa `#3A2B23` for the bar, footer and brand story, and champagne `#A68A5B` only for small accents. The photography carries the colour.
-- **Signature:** small ivory "swing tag" labels on the category photographs, borrowed from the tags on real jewellery.
-- Headlines are set in sentence case rather than all caps, with an italic word for emphasis. Wrap a word in `*asterisks*` in the admin to italicise it.
+**Type.** Imbue, a condensed high-contrast didone from the fashion-masthead tradition, is the display face. It sets the wordmark, headlines, section titles, the Shop menu and product titles. Hanken Grotesk sets everything people read or use: navigation, product names, prices (tabular figures), body copy and buttons. Emphasis is *weight contrast within Imbue*, not italics or a second serif. Wrap a word in `*asterisks*` in the admin and it is set in the hairline weight ("The art of wearing *beauty*.").
+
+**Wordmark.** "Posh" in heavy Imbue, "Jewel" in the hairline weight, mixed case, with no ornament. It uses the same weight contrast as the headlines.
+
+**Navigation.**
+- *Masthead.* The wordmark is anchored left at full size; a short primary list ("Shop", "New in", "Collections", "About") sits off-centre beside it, and the utilities are words rather than icons ("Search", "Account", "Wishlist", "Bag").
+- *Scroll.* The header sticks with a negative offset, so scrolling itself folds the masthead away. One IntersectionObserver flags the compact state and the wordmark scales down from its baseline. There is no scroll listener.
+- *Shop menu.* Opens an editorial panel: category names set large with item counts, and a photograph that follows the name you hover. Collections and help links sit underneath. It lifts open with a clip-path, then the lines rise in sequence. Escape, the Close link or Shop again closes it.
+- *Mobile.* A sheet lifts open under the header, so the wordmark, Close and Bag never move. It has search, category rows with photographs, collection chips and secondary links.
+
+**Calls to action.** One family, with different jobs:
+- *Primary* (`<Cta>`): a ticket-shaped block, label left and a drawn hairline arrow right. On hover a layer wipes across and the arrow lengthens.
+- *Editorial link* (`<CtaLink>`): a short hairline under the words grows to full width while an arrow slides in.
+- *Add to bag* (product page): label and running total separated by a hairline, like a price tag.
+- *Product cards:* an add strip unveils from the base of the photograph on hover; touch screens get a small plus.
+- *Forms:* full-width; a champagne hairline runs along the base while the request is pending.
+- *Navigation:* sentence case; a small "facet" (a rotated square, the brand's only ornament) marks hover and the current page.
+
+**Motion.** One verb, *unveil*: a clip-path lift, like opening a jewellery-box lid. Two easings: silk for arrivals, swift for departures.
+- *Hero:* the photograph unveils and settles, then the headline rises word by word through a mask. This is CSS only and plays once.
+- *Scroll:* section titles, key photographs and product rows reveal once. One shared IntersectionObserver unobserves each element after it reveals.
+- *Product cards:* the second photograph wipes up on hover.
+- *Page transitions:* pages crossfade through React `<ViewTransition>`, and the clicked product photograph morphs into the product page's main image. The header stays anchored.
+- *Performance:* everything animates transform, opacity or clip-path. Reduced motion shows everything instantly, and without JavaScript nothing is hidden. No animation libraries were added.
+
+**Colour.** Ivory `#F5EFE6`, bone `#EAE1D3`, espresso `#1F1813`, cocoa `#3A2B23`, and champagne `#A68A5B` used only for small accents. The swing tags on the category photographs remain.

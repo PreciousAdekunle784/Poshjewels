@@ -98,13 +98,13 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 xl:gap-16">
           <div className="lg:col-span-7">
-            <Gallery images={product.images} name={product.name} />
+            <Gallery images={product.images} name={product.name} productId={product.id} />
           </div>
 
           <div className="lg:col-span-5">
             <div className="max-w-[480px] lg:sticky lg:top-[140px]">
               {product.label && <p className="label text-champagne">{product.label}</p>}
-              <h1 className="display mt-2 text-[34px] lg:text-[42px]">{product.name}</h1>
+              <h1 className="display t-title mt-2">{product.name}</h1>
               {product.isDemo && (
                 <p className="mt-3 border-l-2 border-champagne pl-3 text-[12.5px] leading-snug text-stone">
                   Sample listing for preview. Photograph, price and stock are placeholders until the real piece is added.
@@ -140,7 +140,7 @@ export default async function ProductPage({ params }: Props) {
 
         <section className="mt-20 grid gap-10 border-t border-line pt-14 lg:grid-cols-12" aria-labelledby="product-reviews">
           <div className="lg:col-span-4">
-            <h2 id="product-reviews" className="display text-[30px]">
+            <h2 id="product-reviews" className="display text-[40px]">
               Reviews
             </h2>
             <p className="mt-2 text-stone">
@@ -172,7 +172,7 @@ export default async function ProductPage({ params }: Props) {
 
         {related.items.length > 0 && (
           <section className="mt-20" aria-labelledby="related">
-            <h2 id="related" className="display mb-8 text-[30px]">
+            <h2 id="related" className="display mb-9 text-[40px]">
               You may also like
             </h2>
             <ul className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-5">

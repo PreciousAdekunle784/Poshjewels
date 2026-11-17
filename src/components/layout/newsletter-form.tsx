@@ -24,8 +24,9 @@ export function NewsletterForm({ source, tone = "light" }: { source: string; ton
           className={`h-12 min-w-0 flex-1 bg-transparent outline-none ${dark ? "placeholder:text-ivory/60" : "placeholder:text-stone"}`}
           aria-describedby={`nl-${source}-msg`}
         />
-        <button type="submit" disabled={pending} className="label shrink-0 pl-4 disabled:opacity-50">
-          {pending ? "Subscribing…" : "Subscribe"}
+        <button type="submit" disabled={pending} className="cta-link shrink-0 self-center disabled:opacity-50">
+          <span>{pending ? "Subscribing…" : "Subscribe"}</span>
+          <span className="arrow" aria-hidden />
         </button>
       </div>
       <p id={`nl-${source}-msg`} role="status" className={`mt-2 min-h-[1.25rem] text-[13px] ${state && !state.ok ? (dark ? "text-[#f0b9a8]" : "text-oxblood") : dark ? "text-ivory/80" : "text-stone"}`}>

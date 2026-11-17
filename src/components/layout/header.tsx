@@ -2,138 +2,172 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { MAIN_NAV } from "@/lib/nav";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart/cart-context";
 import { useWishlist } from "@/components/cart/wishlist-context";
-import { BagIcon, CloseIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/icons";
+import { ShopMenu } from "./shop-menu";
+import { MobileMenu } from "./mobile-menu";
 import { SearchPanel } from "./search-panel";
 import { Wordmark } from "./wordmark";
 
-export function Header() {
+export type MenuData = {
+  categories: { slug: string; name: string; description: string | null; imageUrl: string | null; count: number }[];
+  collections: { slug: string; name: string }[];
+};
+
+type Panel = "shop" | "mobile" | "search" | null;
+
+const PRIMARY = [
+  { href: "/collections/new-arrivals", label: "New in" },
+  { href: "/collections", label: "Collections" },
+  { href: "/about", label: "About" },
+];
+
+export function Header({ menu }: { menu: MenuData }) {
   const pathname = usePathname();
   const cart = useCart();
   const wishlist = useWishlist();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const sentinelRef = useRef<HTMLSpanElement>(null);
+  const shopBtnRef = useRef<HTMLButtonElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const [compact, setCompact] = useState(false);
+  const [panel, setPanel] = useState<Panel>(null);
+  const [panelTop, setPanelTop] = useState(0);
 
+  // Compact state: the sentinel sits at the very top of the header. Once it leaves the viewport the
+  // masthead has folded under the sticky offset. One observer, no scroll listener.
   useEffect(() => {
-    setMenuOpen(false);
-    setSearchOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setCompact(!entry.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+  const measure = useCallback(() => {
+    const rect = headerRef.current?.getBoundingClientRect();
+    if (rect) setPanelTop(Math.max(0, rect.bottom));
+  }, []);
 
-  const isActive = (href: string) => (href === "/" || href === "/shop" ? pathname === href : pathname === href || pathname.startsWith(href + "/"));
+  const close = useCallback(() => {
+    setPanel((current) => {
+      if (current === "shop") shopBtnRef.current?.focus();
+      if (current === "mobile") menuBtnRef.current?.focus();
+      return null;
+    });
+  }, []);
+
+  const toggle = (p: Exclude<Panel, null>) => {
+    measure();
+    setPanel((current) => (current === p ? null : p));
+  };
+
+  useEffect(() => {
+    setPanel(null);
+  }, [pathname]);
+
+  useLayoutEffect(() => {
+    if (!panel) return;
+    measure();
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    window.addEventListener("resize", measure);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      root.style.overflow = previous;
+      window.removeEventListener("resize", measure);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [panel, measure, close]);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const shopActive = pathname === "/shop" || pathname.startsWith("/shop/") || pathname.startsWith("/product/");
+  const count = cart.ready ? cart.count : 0;
 
   return (
     <>
-      <header className={`sticky top-0 z-40 bg-ivory transition-[border-color] ${scrolled ? "border-b border-line" : "border-b border-transparent"}`}>
-        <div className="wrap grid h-16 grid-cols-[1fr_auto_1fr] items-center lg:h-[76px]">
-          <div className="flex items-center gap-1 lg:gap-5">
-            <button className="-ml-2 p-2 lg:hidden" onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen}>
-              <MenuIcon size={22} />
-            </button>
-            <button className="flex items-center gap-2 p-2 lg:-ml-2" onClick={() => setSearchOpen(true)} aria-label="Search">
-              <SearchIcon />
-              <span className="label hidden lg:inline">Search</span>
-            </button>
-          </div>
-
-          <Link href="/" aria-label="Posh Jewel — home" className="justify-self-center">
-            <Wordmark className="text-[19px] sm:text-[22px] lg:text-[26px]" />
+      <header
+        ref={headerRef}
+        data-compact={compact || panel !== null}
+        className="masthead sticky z-40 bg-ivory"
+        style={{ viewTransitionName: "site-header" }}
+      >
+        <span ref={sentinelRef} className="pointer-events-none absolute left-0 top-0 h-px w-px" aria-hidden />
+        <div className="wrap relative flex h-[82px] items-end justify-between gap-6 pb-[13px] lg:grid lg:h-[118px] lg:grid-cols-12 lg:items-end lg:gap-x-6 lg:pb-[16px]">
+          <Link href="/" aria-label="Posh Jewel, home" className="masthead-mark block lg:col-span-4" onClick={() => setPanel(null)}>
+            <Wordmark className="text-[40px] lg:text-[62px]" />
           </Link>
 
-          <div className="flex items-center justify-end gap-0.5 sm:gap-2">
-            <Link href="/account" className="hidden p-2 sm:block" aria-label="Account">
-              <UserIcon />
-            </Link>
-            <Link href="/wishlist" className="relative hidden p-2 sm:block" aria-label={`Wishlist${wishlist.ids.length ? `, ${wishlist.ids.length} items` : ""}`}>
-              <HeartIcon />
-              {wishlist.ids.length > 0 && <span className="absolute right-1 top-1.5 h-1.5 w-1.5 rounded-full bg-champagne" aria-hidden />}
-            </Link>
-            <button onClick={cart.open} className="relative -mr-2 flex items-center gap-1.5 p-2" aria-label={`Open bag, ${cart.count} items`}>
-              <BagIcon />
-              <span className="tabular min-w-[1ch] text-[13px]" aria-hidden>
-                {cart.ready && cart.count > 0 ? cart.count : ""}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <nav aria-label="Main" className="hidden lg:block">
-          <ul className="wrap flex h-11 items-center justify-center gap-9">
-            {MAIN_NAV.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`label relative py-1 transition-colors hover:text-espresso ${isActive(item.href) ? "text-espresso after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-espresso" : "text-stone"}`}
-                  aria-current={isActive(item.href) ? "page" : undefined}
+          {/* Desktop: the shop trigger leads a short primary list, placed off-centre beside the masthead. */}
+          <nav aria-label="Main" className="hidden lg:col-span-4 lg:col-start-6 lg:block">
+            <ul className="flex items-center gap-8">
+              <li>
+                <button
+                  ref={shopBtnRef}
+                  type="button"
+                  className="nav-link"
+                  aria-expanded={panel === "shop"}
+                  aria-controls="shop-menu"
+                  aria-current={shopActive ? "page" : undefined}
+                  onClick={() => toggle("shop")}
                 >
-                  {item.label}
-                </Link>
+                  <span className="facet" aria-hidden />
+                  Shop
+                </button>
               </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-
-      {/* Mobile menu */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${menuOpen ? "" : "pointer-events-none"}`} aria-hidden={!menuOpen}>
-        <div className={`absolute inset-0 bg-espresso/40 transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"}`} onClick={() => setMenuOpen(false)} />
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu"
-          className={`absolute left-0 top-0 flex h-full w-[86%] max-w-[380px] flex-col bg-ivory transition-transform duration-300 ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
-        >
-          <div className="flex h-16 items-center justify-between border-b border-line px-4">
-            <Wordmark className="text-[19px]" />
-            <button className="-mr-2 p-2" onClick={() => setMenuOpen(false)} aria-label="Close menu">
-              <CloseIcon size={22} />
-            </button>
-          </div>
-          <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-4">
-            <ul>
-              {MAIN_NAV.map((item) => (
-                <li key={item.href} className="border-b border-line/70">
-                  <Link href={item.href} className={`display block py-3.5 text-[24px] ${isActive(item.href) ? "italic" : ""}`}>
+              {PRIMARY.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="nav-link" aria-current={isActive(item.href) ? "page" : undefined}>
+                    <span className="facet" aria-hidden />
                     {item.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            <ul className="mt-6 grid gap-1 text-[15px]">
-              <li>
-                <Link href="/account" className="flex items-center gap-3 py-2">
-                  <UserIcon /> Account
-                </Link>
-              </li>
-              <li>
-                <Link href="/wishlist" className="flex items-center gap-3 py-2">
-                  <HeartIcon /> Wishlist {wishlist.ids.length > 0 && <span className="text-stone">({wishlist.ids.length})</span>}
-                </Link>
-              </li>
-            </ul>
           </nav>
-        </div>
-      </div>
 
-      <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
+          {/* Utilities are words, not icons, set quieter than the primary list. */}
+          <ul className="flex items-center gap-5 text-stone lg:col-span-3 lg:justify-end lg:gap-6">
+            <li className="hidden lg:block">
+              <button type="button" className="nav-link !text-stone hover:!text-espresso" aria-expanded={panel === "search"} onClick={() => toggle("search")}>
+                Search
+              </button>
+            </li>
+            <li className="hidden lg:block">
+              <Link href="/account" className="nav-link !text-stone hover:!text-espresso">
+                Account
+              </Link>
+            </li>
+            <li className="hidden lg:block">
+              <Link href="/wishlist" className="nav-link !text-stone hover:!text-espresso">
+                Wishlist
+                {wishlist.ready && wishlist.ids.length > 0 && <sup className="tabular -ml-1 text-[10.5px]">{wishlist.ids.length}</sup>}
+              </Link>
+            </li>
+            <li className="lg:hidden">
+              <button ref={menuBtnRef} type="button" className="nav-link w-[3.3rem]" aria-expanded={panel === "mobile"} aria-controls="mobile-menu" onClick={() => toggle("mobile")}>
+                {panel === "mobile" ? "Close" : "Menu"}
+              </button>
+            </li>
+            <li>
+              <button type="button" className="nav-link" onClick={() => (setPanel(null), cart.open())} aria-label={`Bag, ${count} ${count === 1 ? "item" : "items"}`}>
+                Bag
+                <sup className="tabular -ml-1 min-w-[1ch] text-[10.5px]" aria-hidden>
+                  {count > 0 ? count : ""}
+                </sup>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <span className="masthead-rule absolute inset-x-0 bottom-0 h-px bg-line" aria-hidden />
+      </header>
+
+      <ShopMenu open={panel === "shop"} top={panelTop} menu={menu} onClose={close} />
+      <MobileMenu open={panel === "mobile"} top={panelTop} menu={menu} onClose={close} wishlistCount={wishlist.ready ? wishlist.ids.length : 0} />
+      <SearchPanel open={panel === "search"} top={panelTop} onClose={close} />
     </>
   );
 }

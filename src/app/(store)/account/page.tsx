@@ -19,7 +19,7 @@ export default async function AccountPage() {
     <div className="wrap pb-24 pt-10 lg:pt-14">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="display text-[40px] lg:text-[52px]">Hello{session.name ? `, ${session.name.split(" ")[0]}` : ""}.</h1>
+          <h1 className="display t-title">Hello{session.name ? `, ${session.name.split(" ")[0]}` : ""}.</h1>
           <p className="mt-2 text-stone">{session.email}</p>
         </div>
         <div className="flex gap-3">

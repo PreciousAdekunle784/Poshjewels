@@ -1,11 +1,37 @@
+import { asc, eq, sql } from "drizzle-orm";
+import { db, schema } from "@/db";
 import { AnnouncementBar } from "@/components/layout/announcement";
-import { Header } from "@/components/layout/header";
+import { Header, type MenuData } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 import { WishlistProvider } from "@/components/cart/wishlist-context";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { PageTransition } from "@/components/motion/page-transition";
 
-export default function StoreLayout({ children }: { children: React.ReactNode }) {
+async function getMenu(): Promise<MenuData> {
+  const [categories, counts, collections] = await Promise.all([
+    db.select().from(schema.categories).orderBy(asc(schema.categories.sortOrder), asc(schema.categories.name)),
+    db
+      .select({ categoryId: schema.products.categoryId, count: sql<number>`count(*)` })
+      .from(schema.products)
+      .where(eq(schema.products.isPublished, true))
+      .groupBy(schema.products.categoryId),
+    db.select({ slug: schema.collections.slug, name: schema.collections.name }).from(schema.collections).where(eq(schema.collections.isPublished, true)).orderBy(asc(schema.collections.sortOrder)),
+  ]);
+  return {
+    categories: categories.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      description: c.description,
+      imageUrl: c.imageUrl,
+      count: Number(counts.find((x) => x.categoryId === c.id)?.count ?? 0),
+    })),
+    collections,
+  };
+}
+
+export default async function StoreLayout({ children }: { children: React.ReactNode }) {
+  const menu = await getMenu();
   return (
     <CartProvider>
       <WishlistProvider>
@@ -13,8 +39,10 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
           Skip to content
         </a>
         <AnnouncementBar />
-        <Header />
-        <main id="main">{children}</main>
+        <Header menu={menu} />
+        <main id="main">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
         <CartDrawer />
       </WishlistProvider>

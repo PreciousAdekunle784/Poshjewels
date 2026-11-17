@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getSession()) redirect(next?.startsWith("/") ? next : "/account");
   return (
     <div className="wrap max-w-[440px] pb-24 pt-14 lg:pt-20">
-      <h1 className="display text-[40px]">Sign in</h1>
+      <h1 className="display t-title">Sign in</h1>
       <p className="mb-8 mt-2 text-stone">See your orders and check out faster.</p>
       <AuthForm
         action={loginAction}

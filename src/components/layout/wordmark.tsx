@@ -1,7 +1,21 @@
-export function Wordmark({ className = "" }: { className?: string }) {
+/**
+ * The Posh Jewel wordmark: one family, two weights. "Posh" is set heavy, "Jewel" in the hairline
+ * weight, separated only by a hair space — the same weight contrast used to emphasise headlines.
+ */
+export function Wordmark({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <span className={`display inline-flex items-baseline whitespace-nowrap uppercase leading-none tracking-[0.16em] ${className}`} style={{ fontWeight: 500 }}>
-      Posh<span className="mx-[0.35em] inline-block h-[0.2em] w-[0.2em] translate-y-[-0.32em] rotate-45 bg-champagne" aria-hidden />Jewel
+    <span
+      className={`inline-flex items-baseline whitespace-nowrap leading-none ${className}`}
+      style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.015em", fontOpticalSizing: "auto", ...style }}
+      aria-label="Posh Jewel"
+      role="img"
+    >
+      <span style={{ fontWeight: 650 }} aria-hidden>
+        Posh
+      </span>
+      <span style={{ fontWeight: 160, marginLeft: "0.06em" }} aria-hidden>
+        Jewel
+      </span>
     </span>
   );
 }

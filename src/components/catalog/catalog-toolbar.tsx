@@ -88,7 +88,7 @@ export function CatalogToolbar({ total, categoryLinks, showCategory = true }: { 
     <div className="border-y border-line">
       <div className="flex min-h-14 items-center justify-between gap-4">
         <div className="hidden items-center gap-7 lg:flex">{filters}</div>
-        <button type="button" className="label flex min-h-11 items-center gap-2 lg:hidden" onClick={() => setDrawer(true)}>
+        <button type="button" className="nav-link min-h-11 lg:hidden" onClick={() => setDrawer(true)}>
           Filter {chips.length > 0 && <span className="text-stone">({chips.length})</span>}
         </button>
         <div className="flex items-center gap-5">

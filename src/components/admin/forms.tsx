@@ -28,7 +28,7 @@ export function ActionForm({
     <form ref={ref} onSubmit={keepValues(formAction)} className={`grid gap-4 ${className}`}>
       {children}
       <div className="flex flex-wrap items-center gap-4">
-        <button className="btn btn-solid" disabled={pending}>
+        <button className="btn btn-solid btn-submit" disabled={pending} data-pending={pending ? "true" : "false"}>
           {pending ? "Saving…" : submitLabel}
         </button>
         {state && (

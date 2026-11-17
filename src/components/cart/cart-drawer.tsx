@@ -49,7 +49,9 @@ export function CartDrawer() {
         className={`absolute right-0 top-0 flex h-full w-full max-w-[440px] flex-col bg-ivory outline-none transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="flex items-center justify-between border-b border-line px-6 py-5">
-          <p className="label">Your bag {cart.count > 0 && <span className="text-stone">({cart.count})</span>}</p>
+          <p className="display text-[30px] leading-none">
+            Your bag{cart.count > 0 && <sup className="tabular ml-1 font-sans text-[12px] text-stone">{cart.count}</sup>}
+          </p>
           <button onClick={close} className="-mr-2 p-2" aria-label="Close bag">
             <CloseIcon />
           </button>
@@ -59,10 +61,11 @@ export function CartDrawer() {
 
         {cart.lines.length === 0 ? (
           <div className="flex flex-1 flex-col items-start justify-center gap-5 px-6">
-            <p className="display text-3xl">Your bag is empty.</p>
+            <p className="display text-[40px]">Your bag is empty.</p>
             <p className="text-stone">Start with something you&rsquo;ll wear every day.</p>
-            <Link href="/shop" className="btn btn-solid" onClick={close}>
-              Shop all jewellery
+            <Link href="/shop" className="btn btn-solid btn-cta" onClick={close}>
+              <span>Find your next favourite</span>
+              <span className="arrow" aria-hidden />
             </Link>
           </div>
         ) : (
@@ -98,10 +101,11 @@ export function CartDrawer() {
               </div>
               <p className="mt-1 text-[13px] text-stone">Delivery is calculated at checkout.</p>
               <div className="mt-5 grid gap-2">
-                <Link href="/checkout" className="btn btn-solid w-full" onClick={close}>
-                  Checkout
+                <Link href="/checkout" className="btn btn-solid btn-cta w-full" onClick={close}>
+                  <span>Go to checkout</span>
+                  <span className="arrow" aria-hidden />
                 </Link>
-                <Link href="/cart" className="btn btn-outline w-full" onClick={close}>
+                <Link href="/cart" className="cta-link mx-auto mt-2" onClick={close}>
                   View bag
                 </Link>
               </div>

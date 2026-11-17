@@ -16,7 +16,7 @@ export default async function FaqPage() {
     <div className="wrap grid gap-10 pb-24 pt-10 lg:grid-cols-12 lg:pt-14">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <header className="lg:col-span-4">
-        <h1 className="display text-[40px] lg:text-[52px]">Frequently asked questions</h1>
+        <h1 className="display t-title">Frequently asked questions</h1>
         <p className="mt-4 text-stone">
           Still need help?{" "}
           <Link href="/contact" className="link text-espresso">

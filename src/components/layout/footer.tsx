@@ -59,7 +59,7 @@ export async function Footer() {
     <footer className="bg-cocoa text-ivory">
       <div className="wrap grid gap-12 pb-10 pt-16 lg:grid-cols-[1.1fr_1.9fr] lg:gap-20 lg:pt-20">
         <div className="max-w-sm">
-          <Wordmark className="text-[22px]" />
+          <Wordmark className="text-[40px]" />
           <p className="mt-5 text-[14px] leading-relaxed text-ivory/75">{brand.footerDescription}</p>
           <p className="label mt-10 text-ivory/90">Newsletter</p>
           <div className="mt-1">

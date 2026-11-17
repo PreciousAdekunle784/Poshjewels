@@ -17,7 +17,7 @@ export default async function ContactPage() {
   return (
     <div className="wrap grid gap-12 pb-24 pt-10 lg:grid-cols-12 lg:pt-14">
       <div className="lg:col-span-4">
-        <h1 className="display text-[40px] lg:text-[52px]">Contact us</h1>
+        <h1 className="display t-title">Contact us</h1>
         <p className="mt-4 max-w-[38ch] text-stone">
           Questions about a piece, an order or a gift? Send a message and we&rsquo;ll reply by email. You may find a quick answer in our{" "}
           <Link href="/faq" className="link text-espresso">

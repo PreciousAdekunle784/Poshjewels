@@ -177,7 +177,7 @@ export function CheckoutForm({
               {state.message}
             </p>
           )}
-          <button type="submit" disabled={pending || methods.length === 0 || state?.ok} className="btn btn-solid mt-6 w-full">
+          <button type="submit" disabled={pending || methods.length === 0 || state?.ok} data-pending={pending || state?.ok ? "true" : "false"} className="btn btn-solid btn-submit mt-6 w-full">
             {pending || state?.ok ? "Placing order…" : method === "paystack" ? "Continue to payment" : "Place order"}
           </button>
           <p className="mt-3 text-center text-[12.5px] text-stone">

@@ -12,7 +12,7 @@ export default async function AboutPage() {
   return (
     <div className="pb-24">
       <section className="wrap grid gap-10 pt-10 lg:grid-cols-12 lg:items-end lg:pt-14">
-        <h1 className="display text-[44px] lg:col-span-6 lg:text-[64px]">{page?.title ?? "About Posh Jewel"}</h1>
+        <h1 className="display t-title lg:col-span-6">{page?.title ?? "About Posh Jewel"}</h1>
         {body[0] && <p className="max-w-[44ch] text-[17px] leading-relaxed lg:col-span-5 lg:col-start-8">{body[0]}</p>}
       </section>
       <section className="wrap mt-12 grid gap-3 sm:grid-cols-[1.4fr_1fr] lg:mt-16">

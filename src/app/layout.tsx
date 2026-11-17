@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Jost } from "next/font/google";
+import { Hanken_Grotesk, Imbue } from "next/font/google";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const bodoni = Bodoni_Moda({
+/** Display: a condensed, high-contrast didone with an optical-size axis. Wordmark, headlines, menu. */
+const imbue = Imbue({
   subsets: ["latin"],
-  style: ["normal", "italic"],
   axes: ["opsz"],
-  variable: "--font-bodoni",
+  variable: "--font-imbue",
   display: "swap",
 });
 
-const jost = Jost({
+/** Interface: navigation, product information, prices, body copy, buttons. */
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-jost",
+  variable: "--font-hanken",
   display: "swap",
 });
 
@@ -33,7 +34,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-NG" data-scroll-behavior="smooth" className={`${bodoni.variable} ${jost.variable}`}>
+    <html lang="en-NG" data-scroll-behavior="smooth" className={`${imbue.variable} ${hanken.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Scroll reveals only hide content when JavaScript is running, so nothing is lost without it. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.js='1'" }} />
+      </head>
       <body>{children}</body>
     </html>
   );
