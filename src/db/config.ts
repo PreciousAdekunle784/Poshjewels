@@ -1,7 +1,12 @@
 /**
- * Database location. Locally this is a SQLite file. In production it is a Turso/libSQL database:
- * set DATABASE_URL + DATABASE_AUTH_TOKEN, or connect Turso from the Vercel Marketplace (it sets
- * TURSO_DATABASE_URL + TURSO_AUTH_TOKEN, possibly with a custom prefix — any of these are found).
+ * Database location. Locally this is a SQLite file. In production it should be a Turso/libSQL
+ * database: set DATABASE_URL + DATABASE_AUTH_TOKEN, or connect Turso from the Vercel Marketplace
+ * (it sets TURSO_DATABASE_URL + TURSO_AUTH_TOKEN, possibly with a custom prefix — any are found).
+ *
+ * If a Vercel deployment has no database connected, the store still runs in TEMPORARY mode: the
+ * build creates a starter database that ships with the deployment, and each server instance works
+ * on its own copy in /tmp. Browsing, the bag and the admin all work, but changes and orders are
+ * not kept permanently. Connecting Turso switches to permanent storage on the next deploy.
  */
 function findEnv(test: (name: string, value: string) => boolean) {
   for (const [name, value] of Object.entries(process.env)) {
@@ -10,30 +15,21 @@ function findEnv(test: (name: string, value: string) => boolean) {
   return undefined;
 }
 
-export const dbUrl =
+export const LOCAL_DB_FILE = "data/posh.db";
+
+export const configuredDbUrl =
   process.env.DATABASE_URL ||
   process.env.TURSO_DATABASE_URL ||
   findEnv((name, value) => /TURSO.*URL$/i.test(name) || /^libsql:\/\//i.test(value)) ||
-  "file:./data/posh.db";
+  undefined;
 
 export const dbAuthToken =
   process.env.DATABASE_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN || findEnv((name) => /TURSO.*TOKEN$/i.test(name)) || undefined;
 
-export function assertUsableDatabase() {
-  if (!process.env.VERCEL || !dbUrl.startsWith("file:")) return;
-  // Name what *is* configured (never values) so a misconnected store is easy to spot.
-  const related = Object.keys(process.env)
-    .filter((k) => /DATABASE|TURSO|LIBSQL|POSTGRES|PG|NEON|SUPABASE|MYSQL|BLOB/i.test(k) && !/^npm_/i.test(k))
-    .sort();
-  const hasPostgres = related.some((k) => /POSTGRES|NEON|SUPABASE|^PG/i.test(k));
-  throw new Error(
-    [
-      `No database configured for this ${process.env.VERCEL_ENV ?? "Vercel"} build. Vercel has no persistent disk, so the store needs a Turso database.`,
-      "Fix: Vercel → your project → Storage → Turso → Connect Project, with this environment ticked (Production and Preview). Or set DATABASE_URL and DATABASE_AUTH_TOKEN.",
-      hasPostgres ? "Note: a Postgres database is connected, but this store uses Turso (SQLite), not Postgres." : "",
-      `Related variables visible to this build: ${related.length ? related.join(", ") : "none"}.`,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  );
-}
+export const dbUrl = configuredDbUrl ?? `file:./${LOCAL_DB_FILE}`;
+
+/** True on Vercel when no permanent database is connected (see the note above). */
+export const isTemporaryStorage = Boolean(process.env.VERCEL) && dbUrl.startsWith("file:");
+
+/** Where the per-instance working copy lives in temporary mode (the only writable path on Vercel). */
+export const TEMP_DB_PATH = "/tmp/posh-jewel.db";

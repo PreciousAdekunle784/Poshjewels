@@ -6,7 +6,9 @@ import sharp from "sharp";
 import { del, put } from "@vercel/blob";
 
 // Runtime-only location (outside the build), so it is excluded from output file tracing.
-export const UPLOAD_ROOT = path.resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? "./uploads");
+export const UPLOAD_ROOT = path.resolve(
+  /*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? (process.env.VERCEL ? "/tmp/posh-uploads" : "./uploads"),
+);
 /** Uploads go to Vercel Blob when a store is connected (required on Vercel, which has no persistent disk). */
 export const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 export const isBlobUrl = (url: string) => /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//i.test(url);
@@ -31,7 +33,6 @@ export async function saveImage(file: File, folder: "products" | "content" = "pr
     const blob = await put(`${folder}/${name}`, output, { access: "public", contentType: "image/webp", addRandomSuffix: false, cacheControlMaxAge: 31536000 });
     return blob.url;
   }
-  if (process.env.VERCEL) throw new Error("Photo storage isn't connected. Add a Vercel Blob store to this project, then redeploy.");
   const dir = path.join(/*turbopackIgnore: true*/ UPLOAD_ROOT, folder);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(/*turbopackIgnore: true*/ dir, name), output);

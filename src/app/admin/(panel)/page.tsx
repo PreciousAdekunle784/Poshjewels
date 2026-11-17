@@ -3,6 +3,8 @@ import { and, desc, eq, gte, lte, ne, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getSettings } from "@/lib/settings";
 import { paystackEnabled } from "@/lib/paystack";
+import { isTemporaryStorage } from "@/db/config";
+import { useBlob } from "@/lib/uploads";
 import { formatDate, formatNaira } from "@/lib/format";
 import { PageHeader, Panel, StatusPill, td, th } from "@/components/admin/ui";
 import { orderTone, ORDER_LABEL } from "@/components/admin/order-status";
@@ -32,6 +34,8 @@ export default async function AdminHome() {
   ]);
 
   const checklist = [
+    { done: !isTemporaryStorage, text: "Connect a permanent database (Vercel → Storage → Turso), then redeploy", href: null },
+    { done: !process.env.VERCEL || useBlob, text: "Connect photo storage (Vercel → Storage → Blob), then redeploy", href: null },
     { done: demoCount === 0, text: `Replace the ${demoCount} sample products with your real pieces`, href: "/admin/products" },
     { done: paystackEnabled(), text: "Connect Paystack for card payments (add PAYSTACK_SECRET_KEY to the server environment)", href: null },
     { done: !settings.bank.enabled || !!settings.bank.accountNumber, text: "Add your bank details for bank-transfer orders", href: "/admin/settings#bank" },

@@ -69,18 +69,20 @@ Order emails are **not** sent: no email provider is connected. Customers see eve
 
 ## Deploying to Vercel
 
-Vercel has no persistent disk, so the store uses a hosted database (Turso) and hosted photo storage (Vercel Blob). Both are added from the Vercel dashboard in a few clicks.
+**It deploys with no setup at all.** Import the repository on Vercel (Add New → Project → `Poshjewels`) and deploy. The build runs `npm run vercel-build`, which prepares the database and then builds the site.
 
-1. **Import the repository.** Vercel → Add New → Project → choose `Poshjewels`. Keep the detected Next.js settings; the build runs `npm run vercel-build`.
-2. **Add the database.** Project → Storage → *Create Database* → **Turso** (from the Marketplace) → connect it to this project with **both Production and Preview** ticked (otherwise branch/preview builds can't see it). This sets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`; a custom prefix is fine.
-3. **Add photo storage.** Project → Storage → *Create* → **Blob** → connect it to this project. This sets the Blob credentials.
-4. **Add environment variables** (Project → Settings → Environment Variables):
-   - `SESSION_SECRET`: a random string of 32+ characters (for example, the output of `openssl rand -hex 32`).
-   - `ADMIN_EMAIL` and `ADMIN_PASSWORD`: your first admin login (10+ character password). Used once, when no admin exists.
-   - Optional: `NEXT_PUBLIC_SITE_URL` (your custom domain) and `PAYSTACK_SECRET_KEY`.
-5. **Deploy** (Deployments → Redeploy). Each build applies pending migrations; the first one also adds the starter content and sample products. Every later push to `main` deploys automatically.
+**Without a database connected, the store runs on temporary storage.** Browsing, the bag, checkout, accounts and the admin all work. But Vercel has no permanent disk, so product edits, orders, sign-ups and uploaded photos can disappear when the site restarts or redeploys. The admin dashboard shows a notice, and checkout says orders are for testing. Every deploy starts again from the starter content.
 
-If a build fails with *"No database configured"*, Turso isn't connected for that environment yet. The message lists the database-related variables the build can see (names only), which shows what is missing. Note that this store needs **Turso**; a Postgres store (Neon, Supabase) won't work.
+**First admin login.** If `ADMIN_EMAIL` and `ADMIN_PASSWORD` are not set, the build generates an admin and prints the login in the build log (Deployments → the deployment → Build Logs, look for `Admin sign-in`). Set the two variables to choose your own. They always win, and the password needs 10+ characters.
+
+**Make it permanent before taking real orders** (about 5 minutes, in the Vercel dashboard):
+
+1. Project → Storage → *Create Database* → **Turso** (Marketplace) → connect it with **both Production and Preview** ticked. A custom variable prefix is fine. It must be Turso: Postgres stores (Neon, Supabase) won't work.
+2. Project → Storage → *Create* → **Blob** → connect it the same way, for product photos.
+3. Settings → Environment Variables: `SESSION_SECRET` (32+ random characters; without it a new one is generated every deploy and everyone is signed out), `ADMIN_EMAIL`, `ADMIN_PASSWORD`. Optional: `NEXT_PUBLIC_SITE_URL`, `PAYSTACK_SECRET_KEY`.
+4. Redeploy. The build log shows `[db] migrations applied (libsql://…)` and, the first time, the starter content being added. The temporary-storage notice disappears from the admin.
+
+After that, every push to `main` deploys automatically, and database changes in `drizzle/` are applied during the build.
 
 **Other hosts.** Any Node host works. With a persistent disk, keep `data/` and `uploads/` on it and run `npm ci && npm run db:setup && npm run build && npm start`.
 
