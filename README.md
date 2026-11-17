@@ -72,7 +72,7 @@ Order emails are **not** sent: no email provider is connected. Customers see eve
 Vercel has no persistent disk, so the store uses a hosted database (Turso) and hosted photo storage (Vercel Blob). Both are added from the Vercel dashboard in a few clicks.
 
 1. **Import the repository.** Vercel → Add New → Project → choose `Poshjewels`. Keep the detected Next.js settings; the build runs `npm run vercel-build`.
-2. **Add the database.** Project → Storage → *Create Database* → **Turso** (from the Marketplace) → connect it to this project. This sets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
+2. **Add the database.** Project → Storage → *Create Database* → **Turso** (from the Marketplace) → connect it to this project with **both Production and Preview** ticked (otherwise branch/preview builds can't see it). This sets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`; a custom prefix is fine.
 3. **Add photo storage.** Project → Storage → *Create* → **Blob** → connect it to this project. This sets the Blob credentials.
 4. **Add environment variables** (Project → Settings → Environment Variables):
    - `SESSION_SECRET`: a random string of 32+ characters (for example, the output of `openssl rand -hex 32`).
@@ -80,7 +80,7 @@ Vercel has no persistent disk, so the store uses a hosted database (Turso) and h
    - Optional: `NEXT_PUBLIC_SITE_URL` (your custom domain) and `PAYSTACK_SECRET_KEY`.
 5. **Deploy** (Deployments → Redeploy). Each build applies pending migrations; the first one also adds the starter content and sample products. Every later push to `main` deploys automatically.
 
-If a build fails with *"No database configured"*, step 2 hasn't been connected to the project yet.
+If a build fails with *"No database configured"*, Turso isn't connected for that environment yet. The message lists the database-related variables the build can see (names only), which shows what is missing. Note that this store needs **Turso**; a Postgres store (Neon, Supabase) won't work.
 
 **Other hosts.** Any Node host works. With a persistent disk, keep `data/` and `uploads/` on it and run `npm ci && npm run db:setup && npm run build && npm start`.
 
