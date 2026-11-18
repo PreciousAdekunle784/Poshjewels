@@ -9,7 +9,7 @@ import { NewsletterForm } from "@/components/layout/newsletter-form";
 import { FaqList } from "@/components/faq-list";
 import { Reveal } from "@/components/motion/reveal";
 import { Words, plain } from "@/components/motion/words";
-import { Cta, CtaLink } from "@/components/ui/cta";
+import { CtaLink, FrameCta } from "@/components/ui/cta";
 
 /** Section title that rises word by word through a mask as it scrolls into view. */
 export function RevealTitle({ id, text, className = "" }: { id?: string; text: string; className?: string }) {
@@ -76,7 +76,7 @@ export function FeaturedCollection({ featured, products }: { featured: SiteSetti
             {featured.copy}
           </Reveal>
           <Reveal kind="rise" delay={280} className="mt-9">
-            <Cta href={href}>{featured.ctaLabel}</Cta>
+            <FrameCta href={href}>{featured.ctaLabel}</FrameCta>
           </Reveal>
           {products.length > 0 && (
             <ul className="mt-14 grid grid-cols-3 gap-3 border-t border-espresso/15 pt-8">
@@ -116,9 +116,9 @@ export function BrandEditorial({ editorial }: { editorial: SiteSettings["editori
           </Reveal>
           {editorial.ctaLabel && (
             <Reveal kind="rise" delay={320} className="mt-10">
-              <Cta href={editorial.ctaHref} tone="light">
+              <FrameCta href={editorial.ctaHref} light>
                 {editorial.ctaLabel}
-              </Cta>
+              </FrameCta>
             </Reveal>
           )}
         </div>

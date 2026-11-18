@@ -22,7 +22,7 @@
   --color-moss: #3f5a3a;
 
   --font-display: var(--font-imbue), "Didot", "Bodoni 72", Georgia, serif;
-  --font-sans: var(--font-hanken), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-familjen), "Helvetica Neue", Arial, sans-serif;
 
   --breakpoint-xs: 26rem;
 
@@ -49,7 +49,6 @@
     font-size: 15.5px;
     line-height: 1.6;
     font-weight: 400;
-    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -129,7 +128,7 @@
 
   /* Hero scale: condensed letterforms let the line carry presence without dominating the screen. */
   .t-hero {
-    font-size: clamp(54px, 7.4vw, 112px);
+    font-size: clamp(50px, 6.2vw, 96px);
     line-height: 0.9;
     letter-spacing: -0.022em;
   }
@@ -141,22 +140,23 @@
     font-size: clamp(34px, 3.6vw, 52px);
   }
 
-  /* Small editorial label: compact caps for orientation only (sections, legends, captions). */
+  /* Small editorial label: Imbue at its small optical size, in capitals, like an engraved hallmark.
+     Used only for orientation (sections, legends, captions), never for actions. */
   .label {
-    font-family: var(--font-sans);
-    font-size: 11.5px;
-    font-weight: 600;
-    letter-spacing: 0.075em;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: 13.5px;
+    font-weight: 520;
+    letter-spacing: 0.055em;
     text-transform: uppercase;
-    line-height: 1.3;
-    font-feature-settings: "case";
+    line-height: 1.2;
   }
 
   /* Product name and price: plain, legible, tabular figures for price columns. */
   .t-product {
     font-size: 15px;
     line-height: 1.35;
-    font-weight: 450;
+    font-weight: 500;
   }
   .t-price {
     font-size: 14.5px;
@@ -256,6 +256,62 @@
     justify-content: space-between;
     min-width: 248px;
     padding-inline: 1.25rem 1.1rem;
+  }
+
+  /* Frame CTA (editorial primaries): at rest only four corner marks, like the mount around a
+     photograph. On hover the hairlines draw out from each corner until the frame closes, and the
+     arrow lengthens. Solid ink is reserved for commerce (add to bag, checkout). */
+  .btn-frame {
+    --frame: currentColor;
+    --c: 12px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.8rem;
+    min-width: 252px;
+    min-height: 54px;
+    padding: 0 1.15rem 0 1.3rem;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--color-espresso);
+    background:
+      linear-gradient(var(--frame), var(--frame)) left top / var(--c) 1px no-repeat,
+      linear-gradient(var(--frame), var(--frame)) left top / 1px var(--c) no-repeat,
+      linear-gradient(var(--frame), var(--frame)) right top / var(--c) 1px no-repeat,
+      linear-gradient(var(--frame), var(--frame)) right top / 1px var(--c) no-repeat,
+      linear-gradient(var(--frame), var(--frame)) left bottom / var(--c) 1px no-repeat,
+      linear-gradient(var(--frame), var(--frame)) left bottom / 1px var(--c) no-repeat,
+      linear-gradient(var(--frame), var(--frame)) right bottom / var(--c) 1px no-repeat,
+      linear-gradient(var(--frame), var(--frame)) right bottom / 1px var(--c) no-repeat;
+    transition: background-size 700ms var(--ease-silk);
+  }
+  .btn-frame:hover,
+  .btn-frame:focus-visible {
+    background-size:
+      51% 1px, 1px 51%, 51% 1px, 1px 51%,
+      51% 1px, 1px 51%, 51% 1px, 1px 51%;
+  }
+  .btn-frame:focus-visible {
+    outline: none;
+  }
+  .btn-frame:hover .arrow::before,
+  .btn-frame:focus-visible .arrow::before {
+    transform: scaleX(1);
+  }
+  .btn-frame .arrow {
+    transition: transform var(--dur-ui) var(--ease-silk);
+  }
+  .btn-frame:hover .arrow,
+  .btn-frame:focus-visible .arrow {
+    transform: translateX(4px);
+  }
+  .btn-frame-light {
+    color: var(--color-ivory);
   }
 
   /* Purchase button: label and running total separated by a hairline, like a price tag. */
@@ -617,6 +673,26 @@
   animation-delay: var(--d, 900ms);
 }
 
+/* Hero depth: the campaign photograph drifts a little slower than the page as you scroll away.
+   Scroll-driven (no listener), and skipped entirely when unsupported or motion is reduced. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-drift {
+      animation: pj-drift linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+    }
+  }
+}
+@keyframes pj-drift {
+  from {
+    transform: translateY(0) scale(1.08);
+  }
+  to {
+    transform: translateY(3.5%) scale(1.08);
+  }
+}
+
 /* ── View transitions: page crossfade, anchored header, product image morph ── */
 ::view-transition {
   pointer-events: none;
@@ -663,26 +739,94 @@
 
 /* ──────────────────────────────────────────────────────────────────────────
    MASTHEAD
-   The header is taller than what stays on screen: it sticks with a negative top offset,
-   so scrolling itself folds the masthead away (no scroll listener). An observer flags the
-   compact state, and the wordmark scales down from its baseline to sit in the remaining bar.
+   The header is taller than the bar that stays on screen: it sticks with a negative top offset,
+   so scrolling folds it away (no scroll listener). The wordmark scales from its baseline into the
+   bar, driven directly by scroll position (CSS scroll-driven animation) where supported, and by a
+   class toggled from an IntersectionObserver elsewhere.
+   Variants: "standard" on inner pages; "cover" on the homepage, where the wordmark is set at
+   magazine-cover scale and shrinks into the logo as you scroll.
    ────────────────────────────────────────────────────────────────────────── */
 .masthead {
-  --mark-scale: 0.7;
-  top: -26px; /* mobile: 82px tall, 56px visible */
+  --strip: 56px;
+  --mark: 40px;
+  --mh: 84px;
+  --mark-scale: 0.66;
+  --fold: calc(var(--mh) - var(--strip));
+  top: calc(var(--strip) - var(--mh));
+  transition: background-color 600ms var(--ease-silk), color 600ms var(--ease-silk);
+}
+.masthead[data-variant="cover"] {
+  --mark: 82px;
+  --mh: 118px;
+  --mark-scale: 0.32;
+}
+@media (min-width: 640px) {
+  .masthead[data-variant="cover"] {
+    --mark: 112px;
+    --mh: 150px;
+    --mark-scale: 0.25;
+  }
 }
 @media (min-width: 1024px) {
   .masthead {
+    --strip: 64px;
+    --mark: 62px;
+    --mh: 118px;
     --mark-scale: 0.5;
-    top: -54px; /* desktop: 118px tall, 64px visible */
+  }
+  .masthead[data-variant="cover"] {
+    --mark: 118px;
+    --mh: 158px;
+    --mark-scale: 0.265;
   }
 }
+@media (min-width: 1280px) {
+  .masthead[data-variant="cover"] {
+    --mark: 150px;
+    --mh: 190px;
+    --mark-scale: 0.21;
+  }
+}
+@media (min-width: 1440px) {
+  .masthead[data-variant="cover"] {
+    --mark: 186px;
+    --mh: 226px;
+    --mark-scale: 0.168;
+  }
+}
+.masthead-bar {
+  height: var(--mh);
+}
 .masthead-mark {
-  transform-origin: left 82%;
+  font-size: var(--mark);
+  transform-origin: 0% 100%;
   transition: transform var(--dur-ui) var(--ease-silk);
 }
+/* Fallback where scroll-driven animation is unavailable (or motion is reduced): snap on a flag. */
 .masthead[data-compact="true"] .masthead-mark {
   transform: scale(var(--mark-scale));
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .masthead .masthead-mark {
+      animation: pj-mark-fold linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 calc(var(--fold) + 40px);
+    }
+    /* With a panel open the page is scrolled to the fold, so this holds the folded state. */
+    .masthead[data-tray="true"] .masthead-mark {
+      animation: none;
+      transform: scale(var(--mark-scale));
+    }
+  }
+}
+@keyframes pj-mark-fold {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(var(--mark-scale));
+  }
 }
 .masthead-rule {
   transform-origin: left center;
@@ -691,6 +835,31 @@
 }
 .masthead[data-compact="true"] .masthead-rule {
   background-color: color-mix(in srgb, var(--color-espresso) 14%, transparent);
+}
+/* The velvet tray: opening Shop (or the mobile menu) turns the header and panel to deep cocoa. */
+.masthead[data-tray="true"] {
+  background-color: var(--color-cocoa);
+  color: var(--color-ivory);
+}
+.nav-quiet {
+  color: var(--color-stone);
+  transition: color var(--dur-micro) ease;
+}
+.nav-quiet:hover,
+.nav-quiet:focus-visible {
+  color: var(--color-espresso);
+}
+.masthead[data-tray="true"] .nav-link {
+  color: var(--color-ivory);
+}
+.masthead[data-tray="true"] .nav-quiet {
+  color: color-mix(in srgb, var(--color-ivory) 70%, transparent);
+}
+.masthead[data-tray="true"] .nav-quiet:hover {
+  color: var(--color-ivory);
+}
+.masthead[data-tray="true"] .masthead-rule {
+  background-color: color-mix(in srgb, var(--color-ivory) 16%, transparent);
 }
 
 /* ── Editorial panels (Shop menu, mobile menu, search) ──
@@ -737,7 +906,7 @@
 /* Shop menu category list: hovering one name quiets the others. */
 .menu-cats:hover .menu-cat,
 .menu-cats:focus-within .menu-cat {
-  opacity: 0.32;
+  opacity: 0.3;
 }
 .menu-cats .menu-cat[data-active="true"] {
   opacity: 1;
@@ -756,7 +925,8 @@
   transform: rotate(45deg) scale(1);
 }
 
-/* Shop menu photograph: unveils after the panel, then crossfades between categories. */
+/* Shop menu photograph: unveils after the panel. Changing category wipes the new photograph in
+   from the right over the previous one, which holds until it is covered. */
 .menu-figure {
   clip-path: inset(100% 0 0 0);
   transition: clip-path 300ms var(--ease-swift);
@@ -766,13 +936,24 @@
   transition: clip-path 1200ms var(--ease-silk) 220ms;
 }
 .menu-img {
-  opacity: 0;
-  transform: scale(1.06);
-  transition: opacity 700ms var(--ease-silk), transform 1600ms var(--ease-silk);
+  z-index: 1;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0s linear 950ms;
 }
 .menu-img[data-active="true"] {
-  opacity: 1;
+  z-index: 2;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 950ms var(--ease-silk);
+}
+.menu-img img {
+  transform: scale(1.06);
+  transition: transform 1800ms var(--ease-silk);
+}
+.menu-img[data-active="true"] img {
   transform: scale(1);
+}
+.menu-peek {
+  animation: pj-fade-up 700ms var(--ease-silk) both;
 }
 
 /* ── Product card ──

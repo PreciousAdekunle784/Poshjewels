@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Imbue } from "next/font/google";
+import { Familjen_Grotesk, Imbue } from "next/font/google";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -11,10 +11,11 @@ const imbue = Imbue({
   display: "swap",
 });
 
-/** Interface: navigation, product information, prices, body copy, buttons. */
-const hanken = Hanken_Grotesk({
+/** Interface and reading: navigation, product information, prices, body copy, buttons.
+ *  A grotesk with ink traps and characterful g/y, still highly legible at small sizes. */
+const familjen = Familjen_Grotesk({
   subsets: ["latin"],
-  variable: "--font-hanken",
+  variable: "--font-familjen",
   display: "swap",
 });
 
@@ -34,7 +35,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-NG" data-scroll-behavior="smooth" className={`${imbue.variable} ${hanken.variable}`} suppressHydrationWarning>
+    <html lang="en-NG" data-scroll-behavior="smooth" className={`${imbue.variable} ${familjen.variable}`} suppressHydrationWarning>
       <head>
         {/* Scroll reveals only hide content when JavaScript is running, so nothing is lost without it. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.dataset.js='1'" }} />

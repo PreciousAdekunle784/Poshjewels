@@ -1,6 +1,7 @@
 /**
  * The Posh Jewel wordmark: one family, two weights. "Posh" is set heavy, "Jewel" in the hairline
  * weight, separated only by a hair space — the same weight contrast used to emphasise headlines.
+ * Size comes from the parent (font-size), so the masthead can scale it from cover size to logo.
  */
 export function Wordmark({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   return (

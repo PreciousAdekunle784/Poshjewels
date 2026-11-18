@@ -10,8 +10,9 @@ import { MobileMenu } from "./mobile-menu";
 import { SearchPanel } from "./search-panel";
 import { Wordmark } from "./wordmark";
 
+export type MenuPiece = { slug: string; name: string; price: number; image: string | null };
 export type MenuData = {
-  categories: { slug: string; name: string; description: string | null; imageUrl: string | null; count: number }[];
+  categories: { slug: string; name: string; description: string | null; imageUrl: string | null; count: number; pieces: MenuPiece[] }[];
   collections: { slug: string; name: string }[];
 };
 
@@ -33,9 +34,9 @@ export function Header({ menu }: { menu: MenuData }) {
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const [compact, setCompact] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
-  const [panelTop, setPanelTop] = useState(0);
+  const variant = pathname === "/" ? "cover" : "standard";
 
-  // Compact state: the sentinel sits at the very top of the header. Once it leaves the viewport the
+  // Compact flag: the sentinel sits at the very top of the header and leaves the viewport once the
   // masthead has folded under the sticky offset. One observer, no scroll listener.
   useEffect(() => {
     const el = sentinelRef.current;
@@ -43,11 +44,6 @@ export function Header({ menu }: { menu: MenuData }) {
     const io = new IntersectionObserver(([entry]) => setCompact(!entry.isIntersecting), { threshold: 0 });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
-
-  const measure = useCallback(() => {
-    const rect = headerRef.current?.getBoundingClientRect();
-    if (rect) setPanelTop(Math.max(0, rect.bottom));
   }, []);
 
   const close = useCallback(() => {
@@ -58,9 +54,25 @@ export function Header({ menu }: { menu: MenuData }) {
     });
   }, []);
 
+  // Panels open directly under the folded bar, so fold the masthead first if the page is at the top.
+  const foldMasthead = () => {
+    const header = headerRef.current;
+    if (!header) return;
+    const strip = window.innerWidth >= 1024 ? 64 : 56;
+    const foldY = header.offsetTop + header.offsetHeight - strip;
+    if (window.scrollY < foldY - 1) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: foldY, behavior: reduce ? "instant" : "smooth" });
+    }
+  };
+
   const toggle = (p: Exclude<Panel, null>) => {
-    measure();
-    setPanel((current) => (current === p ? null : p));
+    if (panel === p) {
+      setPanel(null);
+      return;
+    }
+    foldMasthead();
+    setPanel(p);
   };
 
   useEffect(() => {
@@ -69,39 +81,41 @@ export function Header({ menu }: { menu: MenuData }) {
 
   useLayoutEffect(() => {
     if (!panel) return;
-    measure();
     const root = document.documentElement;
     const previous = root.style.overflow;
-    root.style.overflow = "hidden";
+    // Let the fold scroll finish before locking the page.
+    const lock = window.setTimeout(() => (root.style.overflow = "hidden"), 450);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
-    window.addEventListener("resize", measure);
     document.addEventListener("keydown", onKey);
     return () => {
+      window.clearTimeout(lock);
       root.style.overflow = previous;
-      window.removeEventListener("resize", measure);
       document.removeEventListener("keydown", onKey);
     };
-  }, [panel, measure, close]);
+  }, [panel, close]);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const shopActive = pathname === "/shop" || pathname.startsWith("/shop/") || pathname.startsWith("/product/");
   const count = cart.ready ? cart.count : 0;
+  const tray = panel === "shop" || panel === "mobile";
 
   return (
     <>
       <header
         ref={headerRef}
+        data-variant={variant}
         data-compact={compact || panel !== null}
-        className="masthead sticky z-40 bg-ivory"
+        data-tray={tray}
+        className="masthead sticky z-40 bg-ivory text-espresso"
         style={{ viewTransitionName: "site-header" }}
       >
         <span ref={sentinelRef} className="pointer-events-none absolute left-0 top-0 h-px w-px" aria-hidden />
-        <div className="wrap relative flex h-[82px] items-end justify-between gap-6 pb-[13px] lg:grid lg:h-[118px] lg:grid-cols-12 lg:items-end lg:gap-x-6 lg:pb-[16px]">
-          <Link href="/" aria-label="Posh Jewel, home" className="masthead-mark block lg:col-span-4" onClick={() => setPanel(null)}>
-            <Wordmark className="text-[40px] lg:text-[62px]" />
+        <div className="masthead-bar wrap relative flex items-end justify-between gap-6 pb-[13px] lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-6 lg:pb-[17px]">
+          <Link href="/" aria-label="Posh Jewel, home" className="masthead-mark block leading-none lg:col-span-4" onClick={() => setPanel(null)}>
+            <Wordmark />
           </Link>
 
-          {/* Desktop: the shop trigger leads a short primary list, placed off-centre beside the masthead. */}
+          {/* Desktop: the shop trigger leads a short primary list, set off-centre beside the masthead. */}
           <nav aria-label="Main" className="hidden lg:col-span-4 lg:col-start-6 lg:block">
             <ul className="flex items-center gap-8">
               <li>
@@ -115,7 +129,7 @@ export function Header({ menu }: { menu: MenuData }) {
                   onClick={() => toggle("shop")}
                 >
                   <span className="facet" aria-hidden />
-                  Shop
+                  {panel === "shop" ? "Close" : "Shop"}
                 </button>
               </li>
               {PRIMARY.map((item) => (
@@ -130,19 +144,19 @@ export function Header({ menu }: { menu: MenuData }) {
           </nav>
 
           {/* Utilities are words, not icons, set quieter than the primary list. */}
-          <ul className="flex items-center gap-5 text-stone lg:col-span-3 lg:justify-end lg:gap-6">
+          <ul className="flex items-center gap-5 lg:col-span-3 lg:justify-end lg:gap-6">
             <li className="hidden lg:block">
-              <button type="button" className="nav-link !text-stone hover:!text-espresso" aria-expanded={panel === "search"} onClick={() => toggle("search")}>
+              <button type="button" className="nav-link nav-quiet" aria-expanded={panel === "search"} onClick={() => toggle("search")}>
                 Search
               </button>
             </li>
             <li className="hidden lg:block">
-              <Link href="/account" className="nav-link !text-stone hover:!text-espresso">
+              <Link href="/account" className="nav-link nav-quiet">
                 Account
               </Link>
             </li>
             <li className="hidden lg:block">
-              <Link href="/wishlist" className="nav-link !text-stone hover:!text-espresso">
+              <Link href="/wishlist" className="nav-link nav-quiet">
                 Wishlist
                 {wishlist.ready && wishlist.ids.length > 0 && <sup className="tabular -ml-1 text-[10.5px]">{wishlist.ids.length}</sup>}
               </Link>
@@ -165,9 +179,9 @@ export function Header({ menu }: { menu: MenuData }) {
         <span className="masthead-rule absolute inset-x-0 bottom-0 h-px bg-line" aria-hidden />
       </header>
 
-      <ShopMenu open={panel === "shop"} top={panelTop} menu={menu} onClose={close} />
-      <MobileMenu open={panel === "mobile"} top={panelTop} menu={menu} onClose={close} wishlistCount={wishlist.ready ? wishlist.ids.length : 0} />
-      <SearchPanel open={panel === "search"} top={panelTop} onClose={close} />
+      <ShopMenu open={panel === "shop"} menu={menu} onClose={close} />
+      <MobileMenu open={panel === "mobile"} menu={menu} onClose={close} wishlistCount={wishlist.ready ? wishlist.ids.length : 0} />
+      <SearchPanel open={panel === "search"} onClose={close} />
     </>
   );
 }

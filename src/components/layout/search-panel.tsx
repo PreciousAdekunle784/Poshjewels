@@ -17,7 +17,7 @@ const SUGGESTED = [
 ];
 
 /** Search lifts open under the header; the query is typed in display type, results arrive as a contact sheet. */
-export function SearchPanel({ open, top, onClose }: { open: boolean; top: number; onClose: () => void }) {
+export function SearchPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [q, setQ] = useState("");
@@ -44,8 +44,8 @@ export function SearchPanel({ open, top, onClose }: { open: boolean; top: number
 
   return (
     <>
-      <div className={`fixed inset-x-0 bottom-0 z-20 bg-espresso/30 transition-opacity duration-500 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ top }} onClick={onClose} aria-hidden />
-      <div data-open={open} aria-hidden={!open} inert={!open} role="dialog" aria-label="Search" className="panel fixed inset-x-0 z-30 max-h-[80vh] overflow-y-auto bg-ivory" style={{ top }}>
+      <div className={`fixed inset-x-0 bottom-0 top-[56px] z-20 bg-espresso/30 transition-opacity duration-500 lg:top-[64px] ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} onClick={onClose} aria-hidden />
+      <div data-open={open} aria-hidden={!open} inert={!open} role="dialog" aria-label="Search" className="panel fixed inset-x-0 top-[56px] z-30 max-h-[80vh] overflow-y-auto bg-ivory lg:top-[64px]">
         <div className="wrap pb-10 pt-8">
           <form
             role="search"

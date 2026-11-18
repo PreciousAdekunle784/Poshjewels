@@ -17,6 +17,16 @@ export function Cta({ href, children, tone = "solid", className = "" }: Common &
   );
 }
 
+/** Editorial primary: corner marks that draw into a closed hairline frame on hover. */
+export function FrameCta({ href, children, light = false, className = "" }: Common & { href: string; light?: boolean }) {
+  return (
+    <Link href={href} className={`btn-frame ${light ? "btn-frame-light" : ""} ${className}`}>
+      <span>{children}</span>
+      <Arrow />
+    </Link>
+  );
+}
+
 /** Secondary editorial link: short hairline grows to full width, arrow slides in. */
 export function CtaLink({ href, children, className = "" }: Common & { href: string }) {
   return (

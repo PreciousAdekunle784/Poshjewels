@@ -102,18 +102,19 @@ tests/               payment verification tests
 
 ## Design system
 
-**Type.** Imbue, a condensed high-contrast didone from the fashion-masthead tradition, is the display face. It sets the wordmark, headlines, section titles, the Shop menu and product titles. Hanken Grotesk sets everything people read or use: navigation, product names, prices (tabular figures), body copy and buttons. Emphasis is *weight contrast within Imbue*, not italics or a second serif. Wrap a word in `*asterisks*` in the admin and it is set in the hairline weight ("The art of wearing *beauty*.").
+**Type.** Imbue, a condensed, high-contrast didone from the fashion-masthead tradition, is the display face. It sets the wordmark, headlines, section titles, the Shop menu, product titles and, at its small optical sizes, the small capitals labels, like engraved hallmarks. Familjen Grotesk sets everything people read or use: navigation, product names, prices (tabular figures), body copy and buttons. Its ink traps and distinctive *g* and *y* give it character while staying very legible. Emphasis is *weight contrast within Imbue*, not italics. Wrap a word in `*asterisks*` in the admin and it is set in the hairline weight ("The art of wearing *beauty*.").
 
 **Wordmark.** "Posh" in heavy Imbue, "Jewel" in the hairline weight, mixed case, with no ornament. It uses the same weight contrast as the headlines.
 
 **Navigation.**
-- *Masthead.* The wordmark is anchored left at full size; a short primary list ("Shop", "New in", "Collections", "About") sits off-centre beside it, and the utilities are words rather than icons ("Search", "Account", "Wishlist", "Bag").
-- *Scroll.* The header sticks with a negative offset, so scrolling itself folds the masthead away. One IntersectionObserver flags the compact state and the wordmark scales down from its baseline. There is no scroll listener.
-- *Shop menu.* Opens an editorial panel: category names set large with item counts, and a photograph that follows the name you hover. Collections and help links sit underneath. It lifts open with a clip-path, then the lines rise in sequence. Escape, the Close link or Shop again closes it.
-- *Mobile.* A sheet lifts open under the header, so the wordmark, Close and Bag never move. It has search, category rows with photographs, collection chips and secondary links.
+- *Cover masthead.* On the homepage the wordmark is set at magazine-cover scale, and scrolling physically shrinks it into the header logo. This uses a CSS scroll-driven animation tied to scroll position, with no scroll listener; where unsupported, an IntersectionObserver flag snaps it instead. Inner pages use a smaller masthead that folds the same way.
+- *Layout.* The wordmark is anchored left; a short primary list ("Shop", "New in", "Collections", "About") sits off-centre on its baseline, and the utilities are words, not icons ("Search", "Account", "Wishlist", "Bag").
+- *Shop menu, "the velvet tray".* Opening Shop turns the header and panel deep cocoa, like jewellery laid on a dark display tray. Category names are set large in ivory with item counts; the photograph wipes across to follow the name you hover or focus (arrow keys work too). Three pieces from that category sit beneath as a direct way in, with collections and help links underneath. The masthead folds first, so the panel always opens under the compact bar.
+- *Mobile.* The same tray: the sheet lifts open under the header, so the wordmark, Close and Bag never move. It has search, swipeable photograph cards for categories, edit chips and quieter links.
 
 **Calls to action.** One family, with different jobs:
-- *Primary* (`<Cta>`): a ticket-shaped block, label left and a drawn hairline arrow right. On hover a layer wipes across and the arrow lengthens.
+- *Editorial primary* (`<FrameCta>`): at rest only four corner marks, like the mount around a photograph. On hover the hairlines draw out until the frame closes, and the arrow lengthens. Used in the hero, the featured edit and the brand story.
+- *Commerce* (`<Cta>`, Add to bag, checkout): solid ink, label left and a drawn hairline arrow right. On hover a bone layer sweeps across and the label turns to ink.
 - *Editorial link* (`<CtaLink>`): a short hairline under the words grows to full width while an arrow slides in.
 - *Add to bag* (product page): label and running total separated by a hairline, like a price tag.
 - *Product cards:* an add strip unveils from the base of the photograph on hover; touch screens get a small plus.
@@ -122,7 +123,7 @@ tests/               payment verification tests
 
 **Motion.** One verb, *unveil*: a clip-path lift, like opening a jewellery-box lid. Two easings: silk for arrivals, swift for departures.
 - *Hero:* the photograph unveils and settles, then the headline rises word by word through a mask. This is CSS only and plays once.
-- *Scroll:* section titles, key photographs and product rows reveal once. One shared IntersectionObserver unobserves each element after it reveals.
+- *Scroll:* section titles, key photographs and product rows reveal once. One shared IntersectionObserver unobserves each element after it reveals. The cover masthead shrinks with scroll position, and the hero photograph drifts slightly slower than the page. Both are CSS scroll-driven and skipped when reduced motion is on.
 - *Product cards:* the second photograph wipes up on hover.
 - *Page transitions:* pages crossfade through React `<ViewTransition>`, and the clicked product photograph morphs into the product page's main image. The header stays anchored.
 - *Performance:* everything animates transform, opacity or clip-path. Reduced motion shows everything instantly, and without JavaScript nothing is hidden. No animation libraries were added.
